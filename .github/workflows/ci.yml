@@ -2,7 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # Ca ba nhanh cua luong promotion dev -> staging -> main. Chi de [main] thi
+    # nhanh ma moi viec thuc su dien ra lai khong duoc kiem tra.
+    branches: [main, staging, dev]
   pull_request:
 
 concurrency:
