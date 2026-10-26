@@ -33,6 +33,17 @@ jobs:
           # key theo lock: torch CPU ~118MB, khong muon tai lai moi lan chay
           cache-dependency-glob: uv.lock
 
+      # Hai thu vien NATIVE duoc load ngay luc import, khong phai luc dung:
+      #   - libportaudio2: sounddevice la binding CFFI cua PortAudio. Wheel cho
+      #     Windows/macOS bundle san thu vien nay, wheel Linux thi khong.
+      #   - libegl1/libgl1: PySide6 can o muc native du chi `import PySide6`.
+      # Day chinh la loai khac biet giua hai OS ma matrix nay duoc dat ra de bat.
+      - name: System audio/GL libs (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libportaudio2 libegl1 libgl1
+
       # Python 3.11 lay tu .python-version, uv tu tai neu runner chua co.
       # --locked: fail neu uv.lock khong con khop pyproject.toml, thay vi
       # am tham giai lai mot graph khac voi local.
