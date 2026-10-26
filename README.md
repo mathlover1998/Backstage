@@ -1,7 +1,9 @@
-# Music Split App
+# Backstage
 
 Hát bài mình thích trước mặt mọi người mà không mất tự tin: **loa ngoài chỉ phát beat**,
 **tai nghe phát guide có giọng gốc** — hai đường sync tuyệt đối.
+
+> Package Python hiện vẫn tên `msa`, chưa đổi theo tên dự án.
 
 ## Nguyên tắc kiến trúc
 
@@ -48,9 +50,19 @@ Mọi thứ gói trong thư mục dự án. Python hệ thống (3.14) không b�
 # uv cai o C:\Users\<user>\.local\bin - them vao PATH neu shell chua thay
 $env:Path = "$env:USERPROFILE\.local\bin;$env:Path"
 
-uv sync                                  # dung lai moi truong tu uv.lock
+uv sync --locked                         # dung lai moi truong tu uv.lock
 uv run python scripts/smoke_test.py      # kiem tra + liet ke output device
 uv run msa                               # CLI
+```
+
+Các bước CI chạy (xem `.github/workflows/ci.yml`) — chạy được hết ở local:
+
+```powershell
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest -q
+uv run python scripts/smoke_test.py --imports-only
 ```
 
 ### Vài quyết định đã chốt, kèm lý do

@@ -15,9 +15,7 @@ def _sample() -> Manifest:
         song=SongInfo(
             fingerprint="aaa", path="x.mp3", duration_sec=241.3, sample_rate=44100, title="Thu"
         ),
-        beat=BeatInfo(
-            fingerprint="bbb", path="b.wav", source=BeatSource.UGC, duration_sec=239.8
-        ),
+        beat=BeatInfo(fingerprint="bbb", path="b.wav", source=BeatSource.UGC, duration_sec=239.8),
         alignment=Alignment(
             method=AlignMethod.DTW,
             offset_ms=-120.5,

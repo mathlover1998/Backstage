@@ -1,6 +1,11 @@
 """Smoke test moi truong: import duoc het? thay output device nao?
 
-Chay: uv run python scripts/smoke_test.py
+    uv run python scripts/smoke_test.py                  # day du
+    uv run python scripts/smoke_test.py --imports-only    # bo qua liet ke device
+
+--imports-only danh cho CI: runner khong co thiet bi audio nen phan device
+luon rong, nhung phan import thi rat dang chay tren tung OS - chinh no da bat
+duoc loi ABI torch/torchaudio (WinError 127).
 """
 
 from __future__ import annotations
@@ -83,22 +88,23 @@ def main() -> int:
     ]:
         ok.append(check(label, fn))
 
-    # Phan quan trong nhat cho Phuong an A: co chon duoc output device khong,
-    # va co device nao >= 2 kenh de chia L/R khong.
-    print("\n-- output devices --")
-    try:
-        import sounddevice as sd
+    if "--imports-only" not in sys.argv:
+        # Phan quan trong nhat cho Phuong an A: co chon duoc output device khong,
+        # va co device nao >= 2 kenh de chia L/R khong.
+        print("\n-- output devices --")
+        try:
+            import sounddevice as sd
 
-        default_out = sd.default.device[1]
-        for i, d in enumerate(sd.query_devices()):
-            if d["max_output_channels"] < 1:
-                continue
-            mark = " <- default" if i == default_out else ""
-            api = sd.query_hostapis(d["hostapi"])["name"]
-            print(f"  [{i:2}] {d['max_output_channels']}ch  {d['name']}  ({api}){mark}")
-    except Exception as e:
-        print(f"  FAIL -> {type(e).__name__}: {e}")
-        ok.append(False)
+            default_out = sd.default.device[1]
+            for i, d in enumerate(sd.query_devices()):
+                if d["max_output_channels"] < 1:
+                    continue
+                mark = " <- default" if i == default_out else ""
+                api = sd.query_hostapis(d["hostapi"])["name"]
+                print(f"  [{i:2}] {d['max_output_channels']}ch  {d['name']}  ({api}){mark}")
+        except Exception as e:
+            print(f"  FAIL -> {type(e).__name__}: {e}")
+            ok.append(False)
 
     print(f"\n{sum(ok)}/{len(ok)} ok")
     return 0 if all(ok) else 1

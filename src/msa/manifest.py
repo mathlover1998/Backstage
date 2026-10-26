@@ -103,9 +103,7 @@ class Manifest:
     quality: Quality = field(default_factory=Quality)
     render: Render | None = None
     schema_version: int = SCHEMA_VERSION
-    created_at: str = field(
-        default_factory=lambda: datetime.now(UTC).isoformat(timespec="seconds")
-    )
+    created_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat(timespec="seconds"))
 
     def save(self, path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)

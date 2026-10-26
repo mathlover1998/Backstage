@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # Chay ca Windows va Linux co ly do cu the, khong phai cho du:
+    # Windows la may dev; Linux la noi engine se chay khi len server. Hai nen
+    # tang nay kiem chung rang `tool.uv.environments` trong pyproject that su
+    # giai duoc o ca hai cho - neu rang buoc platform cua demucs lai gay van de
+    # tren Linux, ta muon biet ngay bay gio chu khong phai luc deploy.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          # key theo lock: torch CPU ~118MB, khong muon tai lai moi lan chay
+          cache-dependency-glob: uv.lock
+
+      # Python 3.11 lay tu .python-version, uv tu tai neu runner chua co.
+      # --locked: fail neu uv.lock khong con khop pyproject.toml, thay vi
+      # am tham giai lai mot graph khac voi local.
+      - name: Sync (locked)
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format
+        run: uv run ruff format --check .
+
+      - name: Tests
+        run: uv run pytest -q
+
+      # Import tung thu vien tren tung OS. Day la buoc da bat duoc loi ABI
+      # torch/torchaudio (WinError 127) - mot loi ma ruff va pytest deu khong
+      # thay. Bo qua phan liet ke audio device vi runner khong co thiet bi.
+      - name: Smoke test (imports)
+        run: uv run python scripts/smoke_test.py --imports-only
