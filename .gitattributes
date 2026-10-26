@@ -1,8 +1,10 @@
 # Dev tren Windows, engine se chay tren Linux (server) -> chuan hoa LF trong repo
 * text=auto eol=lf
 
-# uv.lock la file sinh ra, dung show diff khi review
-uv.lock linguist-generated=true -diff
+# uv.lock la file sinh ra -> thu gon trong PR view cua GitHub.
+# KHONG dat -diff: diff cua lock chinh la cho thay dependency doi the nao,
+# can doc duoc o local.
+uv.lock linguist-generated=true
 
 # audio khong bao gio nen vao repo, nhung neu co thi la binary
 *.wav binary
