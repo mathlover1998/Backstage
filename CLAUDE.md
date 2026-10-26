@@ -63,22 +63,43 @@ riêng có progress**, không bao giờ block UI thread. Thiết kế việc nà
 
 ## Trạng thái hiện tại
 
-Đã có:
+**Option 1 chạy được end-to-end.**
 
 ```
-src/msa/manifest.py    artifact contract - hợp đồng engine <-> player
-src/msa/paths.py       cache layout, fingerprint theo nội dung file
-src/msa/cli.py         entry point tạm
-scripts/smoke_test.py
-tests/test_manifest.py
+src/msa/manifest.py          artifact contract - hợp đồng engine <-> player
+src/msa/paths.py             cache layout, fingerprint theo nội dung file
+src/msa/engine/separate.py   Demucs -> vocals.wav + no_vocals.wav (cache theo fp+model)
+src/msa/engine/render.py     -> render.wav stereo: L = guide, R = beat
+src/msa/player/device.py     liệt kê / chọn output device
+src/msa/player/dual.py       OutputStream 2 kênh, mix trong callback
+src/msa/cli.py               msa devices | prepare | play
 ```
 
-**Chưa tồn tại** (chưa phải stub, là chưa có file): `engine/separate.py`, `engine/align.py`,
-`engine/score.py`, `engine/render.py`, `player/device.py`, `player/dual.py`, `jobs.py`,
-`ui/app.py`.
+**Chưa tồn tại** (chưa phải stub, là chưa có file): `engine/align.py`, `engine/score.py`
+(cả hai cho Option 2), `jobs.py`, `ui/app.py`.
 
-Bước tiếp theo đã thống nhất: `separate.py` + `render.py` + `player/dual.py` để chạy
-end-to-end Option 1.
+### Kiểm chứng đã làm trên output thật của Demucs
+
+Trên `render.wav` sinh từ một lần tách thật:
+
+```
+max|R - mono(no_vocals)|    = 1.19e-07   (= 2^-23, đúng sàn lượng tử 24-bit)
+max|(L-R) - mono(vocals)|   = 1.19e-07
+lag cross-correlation       = 0 mẫu
+```
+
+Tức beat ở hai kênh triệt tiêu hoàn toàn — sai số duy nhất là lượng tử hóa 24-bit,
+không có offset. Test `test_render.py::test_beat_cancels_exactly_between_channels`
+giữ tính chất này; **đừng xoá nó**, nó là lời hứa cốt lõi của sản phẩm dưới dạng
+một phép trừ.
+
+### Chưa làm / chưa biết
+
+- **Chưa phát thử ra thiết bị thật.** Toàn bộ kiểm chứng ở trên là trên file. Chưa
+  ai cắm jack chia đôi và nghe, nên chưa biết `blocksize=1024` có đủ tránh dropout
+  hay chưa.
+- **Chưa thử retask jack Realtek** để lấy hai cặp stereo độc lập (Phương án B,
+  xem README). Realtek trên máy dev báo 8 kênh nên khả năng có.
 
 ## Lưu ý
 

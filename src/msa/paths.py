@@ -1,8 +1,12 @@
 """Cache layout. Moi thu key theo fingerprint, khong theo ten file.
 
 cache/
-  songs/<song_fp>/           vocals.wav, no_vocals.wav   (ket qua Demucs, tach 1 lan)
+  songs/<song_fp>/<model>/    vocals.wav, no_vocals.wav  (ket qua Demucs, tach 1 lan)
   pairs/<song_fp>__<beat_fp>/ manifest.json, render.wav
+
+Ten model nam trong duong dan co chu y: doi model (htdemucs -> htdemucs_ft) phai
+ra stems khac, khong duoc dung lai cache cu. De no vao path thi tinh dung dan cua
+cache la tinh cau truc, khong can file metadata rieng de kiem tra.
 """
 
 from __future__ import annotations
@@ -14,8 +18,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CACHE_DIR = PROJECT_ROOT / "cache"
 
 
-def song_dir(song_fp: str) -> Path:
-    return CACHE_DIR / "songs" / song_fp
+def stems_dir(song_fp: str, model: str) -> Path:
+    return CACHE_DIR / "songs" / song_fp / model
 
 
 def pair_dir(song_fp: str, beat_fp: str) -> Path:

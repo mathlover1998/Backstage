@@ -52,8 +52,29 @@ $env:Path = "$env:USERPROFILE\.local\bin;$env:Path"
 
 uv sync --locked                         # dung lai moi truong tu uv.lock
 uv run python scripts/smoke_test.py      # kiem tra + liet ke output device
-uv run msa                               # CLI
 ```
+
+### Dùng (Option 1)
+
+```powershell
+uv run msa devices                       # xem output device nao dang co
+uv run msa prepare "D:\nhac\bai.mp3"     # tach + render + ghi manifest
+uv run msa play    "D:\nhac\bai.mp3" --guide 0.7 --device "Realtek"
+```
+
+`prepare` cache theo (fingerprint file, model) nên chạy lại là tức thì.
+`play` mix trực tiếp từ stems chứ không phát `render.wav` — để `guide_gain`
+còn đổi được lúc đang hát. `render.wav` là artifact mang đi máy khác.
+
+**Đã kiểm chứng** trên `render.wav` sinh từ một lần tách thật:
+
+```
+max|R - mono(no_vocals)|   = 1.19e-07   (= 2^-23, dung san luong tu 24-bit)
+max|(L-R) - mono(vocals)|  = 1.19e-07
+lag cross-correlation      = 0 mau
+```
+
+Beat ở hai kênh triệt tiêu hoàn toàn, không có offset.
 
 Các bước CI chạy (xem `.github/workflows/ci.yml`) — chạy được hết ở local:
 
