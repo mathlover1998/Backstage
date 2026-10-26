@@ -1,0 +1,76 @@
+[project]
+name = "music-split-app"
+version = "0.1.0"
+description = "Hat tren beat ngoai loa, nghe ban goc trong tai nghe - sync tuyet doi"
+requires-python = "==3.11.*"
+
+dependencies = [
+    # --- separation engine ---
+    # torchaudio CO Y khong co mat: demucs 4.1.0 chi can no cho extra "train",
+    # runtime dung sphn de doc/ghi audio. Them torchaudio vao chi tao them mot
+    # rang buoc ABI voi torch (da tung gay WinError 127) ma khong duoc gi.
+    "torch>=2.4",
+    "demucs>=4.1.0",
+
+    # --- alignment (Option 2: beat co san) ---
+    "librosa>=0.10.2",
+    "scipy>=1.11",
+    "numpy>=1.26",
+
+    # --- audio IO / playback ---
+    "soundfile>=0.12",
+    "sounddevice>=0.4.6",
+    # ffmpeg binary nam trong venv, khong cai vao he thong
+    "imageio-ffmpeg>=0.5",
+
+    # --- UI ---
+    "pyside6>=6.7",
+]
+
+[project.scripts]
+msa = "msa.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[tool.uv]
+# cache uv nam o C:, du an o D: -> khong hardlink duoc, copy thang cho do warning
+link-mode = "copy"
+
+# uv mac dinh giai mot lock "universal" phu moi platform. Trong do co
+# macOS x86_64 (Intel Mac) - noi demucs ghim torch<2.3. Rang buoc cua
+# platform do keo torch tren Windows xuong 2.2.2, lech ABI voi torchaudio.
+# Gioi han dung cac platform thuc su nam trong ke hoach:
+environments = [
+    "sys_platform == 'win32'",                                  # may dev
+    "sys_platform == 'linux' and platform_machine == 'x86_64'", # engine server sau nay
+    "sys_platform == 'darwin' and platform_machine == 'arm64'", # Apple Silicon
+]
+
+# torch lay tu index CPU-only (may khong co CUDA)
+# ~200MB thay vi ~2.5GB cua ban cu124
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/msa"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint.per-file-ignores]
+# smoke test co y bat Exception rong: muc dich la bao cao TAT CA import that bai,
+# khong phai dung o cai dau tien
+"scripts/smoke_test.py" = ["BLE001"]

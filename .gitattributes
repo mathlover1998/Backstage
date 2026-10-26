@@ -1,0 +1,11 @@
+# Dev tren Windows, engine se chay tren Linux (server) -> chuan hoa LF trong repo
+* text=auto eol=lf
+
+# uv.lock la file sinh ra, dung show diff khi review
+uv.lock linguist-generated=true -diff
+
+# audio khong bao gio nen vao repo, nhung neu co thi la binary
+*.wav binary
+*.mp3 binary
+*.flac binary
+*.m4a binary

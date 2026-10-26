@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+
+# quyen Claude Code theo tung may - settings.json (khong .local) moi la ban chia se
+.claude/settings.local.json
+
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# stems + render + manifest sinh ra tu engine, tai lai duoc
+cache/
+
+# nhac nguoi dung tu dua vao - khong bao gio commit
+media/
+*.wav
+*.mp3
+*.flac
+*.m4a
