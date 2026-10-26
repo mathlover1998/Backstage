@@ -1,4 +1,4 @@
-from msa.manifest import (
+from backstage.manifest import (
     Alignment,
     AlignMethod,
     BeatInfo,

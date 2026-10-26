@@ -19,8 +19,8 @@ from typing import Self
 import numpy as np
 import soundfile as sf
 
-from msa.engine.render import to_mono
-from msa.engine.separate import Stems
+from backstage.engine.render import to_mono
+from backstage.engine.separate import Stems
 
 
 def mix_block(

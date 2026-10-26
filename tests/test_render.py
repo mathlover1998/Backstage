@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from msa.engine.render import build_dual_mono, render, to_mono
-from msa.engine.separate import Stems
+from backstage.engine.render import build_dual_mono, render, to_mono
+from backstage.engine.separate import Stems
 
 
 def _tone(freq: float, n: int, sr: int = 44100, amp: float = 0.3) -> np.ndarray:

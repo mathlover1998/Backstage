@@ -3,8 +3,6 @@
 Hát bài mình thích trước mặt mọi người mà không mất tự tin: **loa ngoài chỉ phát beat**,
 **tai nghe phát guide có giọng gốc** — hai đường sync tuyệt đối.
 
-> Package Python hiện vẫn tên `msa`, chưa đổi theo tên dự án.
-
 ## Nguyên tắc kiến trúc
 
 Không bao giờ phát bản gốc trực tiếp ra tai nghe. Thay vào đó:
@@ -57,14 +55,18 @@ uv run python scripts/smoke_test.py      # kiem tra + liet ke output device
 ### Dùng (Option 1)
 
 ```powershell
-uv run msa devices                       # xem output device nao dang co
-uv run msa prepare "D:\nhac\bai.mp3"     # tach + render + ghi manifest
-uv run msa play    "D:\nhac\bai.mp3" --guide 0.7 --device "Realtek"
+uv run backstage ui                            # cua so: chon file + slider guide gain
+uv run backstage devices                       # xem output device nao dang co
+uv run backstage prepare "D:\nhac\bai.mp3"     # tach + render + ghi manifest
+uv run backstage play    "D:\nhac\bai.mp3" --guide 0.7 --device "Realtek"
 ```
 
 `prepare` cache theo (fingerprint file, model) nên chạy lại là tức thì.
 `play` mix trực tiếp từ stems chứ không phát `render.wav` — để `guide_gain`
 còn đổi được lúc đang hát. `render.wav` là artifact mang đi máy khác.
+
+Dùng `ui` nếu muốn **kéo slider giọng guide trong lúc đang hát** — CLI chỉ nhận
+một giá trị cố định lúc khởi động.
 
 **Đã kiểm chứng** trên `render.wav` sinh từ một lần tách thật:
 
@@ -100,11 +102,20 @@ uv run python scripts/smoke_test.py --imports-only
 ## Cấu trúc
 
 ```
-src/msa/
-  manifest.py     # artifact contract - hop dong trung tam engine <-> player
-  paths.py        # cache layout, key theo fingerprint
-  cli.py
+src/backstage/
+  manifest.py          # artifact contract - hop dong trung tam engine <-> player
+  paths.py             # cache layout, key theo fingerprint
+  engine/separate.py   # Demucs -> vocals.wav + no_vocals.wav
+  engine/render.py     # -> render.wav stereo: L = guide, R = beat
+  player/device.py     # liet ke / chon output device
+  player/dual.py       # OutputStream 2 kenh, mix trong callback
+  ui/app.py            # cua so PySide6
+  cli.py               # ui | devices | prepare | play
 scripts/
   smoke_test.py
-cache/            # stems + render + manifest (gitignored)
+cache/                 # stems + render + manifest (gitignored)
 ```
+
+> Thư mục dự án vẫn tên `D:\Music Split App`. Đổi tên thư mục phải làm ngoài
+> phiên làm việc (đóng editor → đổi tên → mở lại), vì nó là cwd và chứa `.venv`
+> với đường dẫn tuyệt đối. Không ảnh hưởng gì tới code.

@@ -1,8 +1,9 @@
 """CLI chay end-to-end Option 1.
 
-msa devices                      liet ke output device
-msa prepare <bai.mp3>            tach + render + ghi manifest
-msa play <bai.mp3> --guide 0.7   phat: L = guide, R = beat
+backstage ui                           mo cua so (chon file, slider guide gain)
+backstage devices                      liet ke output device
+backstage prepare <bai.mp3>            tach + render + ghi manifest
+backstage play <bai.mp3> --guide 0.7   phat: L = guide, R = beat
 """
 
 from __future__ import annotations
@@ -12,8 +13,8 @@ import sys
 import time
 from pathlib import Path
 
-from msa import paths
-from msa.manifest import (
+from backstage import paths
+from backstage.manifest import (
     Alignment,
     AlignMethod,
     BeatInfo,
@@ -31,8 +32,8 @@ def _fmt_time(sec: float) -> str:
 
 
 def _prepare(args: argparse.Namespace) -> int:
-    from msa.engine import render as render_mod
-    from msa.engine import separate as separate_mod
+    from backstage.engine import render as render_mod
+    from backstage.engine import separate as separate_mod
 
     song = Path(args.song)
     print(f"bai   : {song.name}")
@@ -90,9 +91,9 @@ def _prepare(args: argparse.Namespace) -> int:
 
 
 def _play(args: argparse.Namespace) -> int:
-    from msa.engine import separate as separate_mod
-    from msa.player.device import resolve_device
-    from msa.player.dual import DualPlayer
+    from backstage.engine import separate as separate_mod
+    from backstage.player.device import resolve_device
+    from backstage.player.dual import DualPlayer
 
     song = Path(args.song)
     stems = separate_mod.separate(song, model=args.model, progress=True)
@@ -127,16 +128,30 @@ def _play(args: argparse.Namespace) -> int:
 
 
 def _devices(_args: argparse.Namespace) -> int:
-    from msa.player.device import list_output_devices
+    from backstage.player.device import list_output_devices
 
     for d in list_output_devices():
         print(d)
     return 0
 
 
+def _ui(_args: argparse.Namespace) -> int:
+    from backstage.ui.app import run
+
+    return run()
+
+
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="msa", description=__doc__)
+    parser = argparse.ArgumentParser(
+        prog="backstage",
+        description=__doc__,
+        # Khong co dong nay thi argparse bop newline cua docstring thanh mot cuc.
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     sub = parser.add_subparsers(dest="cmd", required=True)
+
+    p_ui = sub.add_parser("ui", help="mo cua so")
+    p_ui.set_defaults(func=_ui)
 
     p_dev = sub.add_parser("devices", help="liet ke output device")
     p_dev.set_defaults(func=_devices)

@@ -1,6 +1,6 @@
 """Chon output device.
 
-Tach rieng khoi dual.py vi `msa devices` phai chay duoc ma khong keo theo gi,
+Tach rieng khoi dual.py vi `backstage devices` phai chay duoc ma khong keo theo gi,
 va vi buoc chon device la noi de sai nhat khi cam jack chia doi / DAC roi.
 """
 

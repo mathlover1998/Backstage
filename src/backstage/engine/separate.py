@@ -11,13 +11,14 @@ hay UI thread.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
 import soundfile as sf
 
-from msa import paths
+from backstage import paths
 
 VOCALS_NAME = "vocals.wav"
 NO_VOCALS_NAME = "no_vocals.wav"
@@ -59,10 +60,16 @@ def separate(
     jobs: int = 0,
     force: bool = False,
     progress: bool = True,
+    callback: Callable[[dict], None] | None = None,
 ) -> Stems:
     """Tach `song` thanh vocals + no_vocals, cache theo (fingerprint, model).
 
     `force=True` de tach lai du da co cache.
+
+    `callback` duoc Demucs goi trong luc tach, nhan dict co 'segment_offset',
+    'audio_length', 'model_idx_in_bag', 'models'. UI dung no de ve progress
+    that thay vi mot thanh chay vo nghia (xem backstage.ui.app). Callback chay
+    tren thread dang tach, khong phai UI thread.
     """
     song = Path(song)
     if not song.is_file():
@@ -85,10 +92,12 @@ def separate(
         )
 
     # Import trong ham: demucs keo theo torch, mat vai giay. Cac lenh khong tach
-    # (vi du `msa devices`) khong nen phai tra gia do.
+    # (vi du `backstage devices`) khong nen phai tra gia do.
     from demucs.api import Separator
 
-    separator = Separator(model=model, device="cpu", jobs=jobs, progress=progress)
+    separator = Separator(
+        model=model, device="cpu", jobs=jobs, progress=progress, callback=callback
+    )
     _origin, stems = separator.separate_audio_file(song)
 
     if "vocals" not in stems:

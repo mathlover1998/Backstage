@@ -66,17 +66,18 @@ riêng có progress**, không bao giờ block UI thread. Thiết kế việc nà
 **Option 1 chạy được end-to-end.**
 
 ```
-src/msa/manifest.py          artifact contract - hợp đồng engine <-> player
-src/msa/paths.py             cache layout, fingerprint theo nội dung file
-src/msa/engine/separate.py   Demucs -> vocals.wav + no_vocals.wav (cache theo fp+model)
-src/msa/engine/render.py     -> render.wav stereo: L = guide, R = beat
-src/msa/player/device.py     liệt kê / chọn output device
-src/msa/player/dual.py       OutputStream 2 kênh, mix trong callback
-src/msa/cli.py               msa devices | prepare | play
+src/backstage/manifest.py          artifact contract - hợp đồng engine <-> player
+src/backstage/paths.py             cache layout, fingerprint theo nội dung file
+src/backstage/engine/separate.py   Demucs -> vocals.wav + no_vocals.wav (cache theo fp+model)
+src/backstage/engine/render.py     -> render.wav stereo: L = guide, R = beat
+src/backstage/player/device.py     liệt kê / chọn output device
+src/backstage/player/dual.py       OutputStream 2 kênh, mix trong callback
+src/backstage/ui/app.py            cửa sổ PySide6 + SeparateWorker (QThread)
+src/backstage/cli.py               backstage ui | devices | prepare | play
 ```
 
 **Chưa tồn tại** (chưa phải stub, là chưa có file): `engine/align.py`, `engine/score.py`
-(cả hai cho Option 2), `jobs.py`, `ui/app.py`.
+(cả hai cho Option 2), `jobs.py`.
 
 ### Kiểm chứng đã làm trên output thật của Demucs
 
@@ -103,7 +104,9 @@ một phép trừ.
 
 ## Lưu ý
 
-- Package Python vẫn tên `msa`, chưa đổi theo tên dự án `Backstage`.
+- Thư mục dự án vẫn tên `D:\Music Split App` (package và CLI đã là `backstage`).
+  Đổi tên thư mục phải làm ngoài phiên: nó là cwd và chứa `.venv` với đường dẫn
+  tuyệt đối.
 - **Không commit file audio.** `.gitignore` đã chặn; đừng nới ra.
 - Comment và docstring trong code viết **tiếng Việt không dấu** (tránh lỗi encoding trên
   Windows console); tài liệu `.md` thì có dấu bình thường.

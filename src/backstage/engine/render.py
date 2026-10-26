@@ -8,7 +8,7 @@ khong phai canh sync o runtime. Doi lai: moi ben la mono.
 
 Dung file nay khi can mot artifact mang di dau cung duoc (cam jack chia doi vao
 may nao cung chay). Khi phat tu trong app thi player mix truc tiep tu stems
-(xem msa.player.dual) de nguoi hat van keo duoc slider guide gain luc dang hat -
+(xem backstage.player.dual) de nguoi hat van keo duoc slider guide gain luc dang hat -
 bake gain vao file thi mat kha nang do.
 """
 
@@ -20,7 +20,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from msa.engine.separate import Stems
+from backstage.engine.separate import Stems
 
 # 24-bit cho file cuoi: du dong cho moi muc dich thuc te, va tranh WAV float
 # ma mot so may phat/loa di dong khong doc duoc.

@@ -9,8 +9,8 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from msa.engine.separate import Stems
-from msa.player.dual import load_stems_mono, mix_block
+from backstage.engine.separate import Stems
+from backstage.player.dual import load_stems_mono, mix_block
 
 
 def _ramp(n: int) -> np.ndarray:
